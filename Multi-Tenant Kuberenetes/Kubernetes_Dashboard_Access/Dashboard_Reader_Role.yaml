@@ -1,0 +1,18 @@
+---
+#dashboardreaderrole.yml
+# Used for 'kubernetes-dashboard' access
+# This Role file creates a role in kube-system namespace which gives privlege to 'list' pods i.e. kuberenetes pod and to proxy services to access dashboard with reader permissions
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: dashboard-reader
+  namespace: kube-system
+rules:
+- apiGroups: [""]
+  resources: ["pods"] # need to minimize the scope to kubernetes-dashboard
+  verbs: ["list"]
+- apiGroups: [""]
+  resources: ["services/proxy"]
+  verbs: ["get"]
+---

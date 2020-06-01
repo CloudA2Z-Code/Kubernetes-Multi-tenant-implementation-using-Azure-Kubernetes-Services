@@ -1,0 +1,19 @@
+# Fetching Inputs
+
+## dashboard-reader-binding
+# Below code creates 'dashboard-reader-binding' RoleBinding for kubernetes dashboard access.
+# Used for 'kubernetes-dashboard' access, this can be applied on AAD group.
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dashboard-reader-binding
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: dashboard-reader
+subjects:
+  - kind: Group
+    name: 6***********************f  # AAD Group Object ID
+---

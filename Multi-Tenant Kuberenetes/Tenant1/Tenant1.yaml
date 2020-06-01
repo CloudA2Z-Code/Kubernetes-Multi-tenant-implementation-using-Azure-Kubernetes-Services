@@ -1,0 +1,173 @@
+# Namespace Naming Convention(lowercase Only) : applicationname + billing_plan_id + env + servicecomponent
+
+# Remove the namespace prefix in the roles and role bindings
+
+
+## Namespace Admin
+# Use this for 'namespace admin' user access
+# This below lines of code creates Namespace, Role with Namespace Admin privileges & Role Bindings in a namespace.
+# Note: Deployments and Services is your_namespace_name developers responsibilty
+---
+# Created a project specific namespace 'your_namespace_name'
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  labels:
+    environment: dev
+    project_name: your_namespace_project_name
+    application_name: devopsdemo    
+    contact_kid: onwer_email
+  name: your_namespace_name
+---
+# Creates a ResourceQuota 'requests-resourcequota' Specific to project namespace
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: requests-resourcequota
+  namespace: your_namespace_name
+spec:
+  hard:
+    #pods: "4"
+    requests.cpu: "2" # metric - 'm' millicore, containers can get a single req with 500m or 50 requests with 10m 
+    requests.memory: 8Gi # metrics - 'Mib' or 'Gib' total requested memory by container < 1GB
+    limits.cpu: "2" # Maximum CPU which can be claimed by combined or single container
+    limits.memory: 8Gi # Maximum Memory which can be claimed by combined or single container
+---
+# Creates a Role 'namespace-admin-r' Specific to project namespace
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: namespace-admin-r
+  namespace: your_namespace_name
+rules:
+  # "roles" rules
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["roles"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  # "rolebindings" rules
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["rolebindings"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]  
+  # Services
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "view", "create", "update", "delete"]
+  # services endpoints
+- apiGroups: [""]
+  resources: ["endpoints"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"] 
+  # "Pods" rules
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  # "pods/log" rules
+- apiGroups: ["", "metrics.k8s.io", "extensions", "apps"]
+  resources: ["pods/log"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  # "pods/attach" rules
+- apiGroups: [""]
+  resources: ["pods/attach"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  # "Nodes" rules - Node rules are effective only on cluster-role-binding
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
+  # "Secrets" rules
+  # Find way to filter secrets of type : "kubernetes.io/service-account-token", "Opaque", "helm.sh/release.v1", "kubernetes.io/tls"
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list", "watch", "create","update", "delete"]
+  # "TLS Secrets" rules
+  # Need to add TLS sepration in future
+  # "deployments" rules
+- apiGroups: ["apps", "batch", "extensions"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  # "services" rules
+  # "configmaps" rules
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]  
+  # "Extensions" rules
+- apiGroups: ["batch", "extensions"]
+  resources: ["jobs"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # "cronjobs" rules
+- apiGroups: ["batch"]
+  resources: ["cronjobs"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  # "daemonsets" rules
+- apiGroups: ["apps", "extensions"]
+  resources: ["daemonsets"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  # "ingresses" rules
+- apiGroups: ["extensions"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  # "replicasets" rules
+- apiGroups: ["apps", "extensions"]
+  resources: ["replicasets"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  #statefulsets
+- apiGroups: ["apps"]
+  resources: ["statefulsets"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  #replicationcontrollers
+- apiGroups: [""]
+  resources: ["replicationcontrollers"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  #events
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  #persistentvolumes
+  # "Persistent volumes" rules - are effective only on cluster-role-binding
+- apiGroups: [""]
+  resources: ["persistentvolumes"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  #persistentvolumeclaims
+- apiGroups: [""]
+  resources: ["persistentvolumeclaims"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  #storageclasses
+  # "storageclasses" rules - are effective only on cluster-role-binding
+- apiGroups: ["storage.k8s.io"]
+  resources: ["storageclasses"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  #resourcequotas
+- apiGroups: [""]
+  resources: ["resourcequotas"]
+  verbs: ["get", "list", "watch"]
+  #limitranges : need to be finalized
+- apiGroups: [""]
+  resources: ["limitranges"]
+  verbs: ["get", "list", "watch"]
+  # NetworkPolicyExtension : need to be finalized
+- apiGroups: ["extensions"]
+  resources: ["networkpolicies"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  # "Network Policies" : need to be finalized
+- apiGroups: ["networking.k8s.io"]
+  resources: ["networkpolicies"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+---
+# Below code creates 'namespace-admin-rbg' RoleBinding which attaches the AAD Group or users to a Role with Namespace admin priveleges. 
+# Note: Email IDs ust be in lowercase only.
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: namespace-admin-rbg
+  namespace: your_namespace_name
+subjects:
+  # CMC team members - list start
+- kind: User
+  name: "email_ID"
+roleRef:
+  kind: Role #this must be Role or ClusterRole
+  name: namespace-admin-r # must match the name of the Role
+  apiGroup: rbac.authorization.k8s.io
+---

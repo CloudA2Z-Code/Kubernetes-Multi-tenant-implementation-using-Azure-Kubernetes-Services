@@ -1,0 +1,7 @@
+// Commands to connect RBAC cluster
+az aks get-credentials --resource-group "your_RG_name" --name "your_cluster_name" --subscription "your_subscription_name" --admin
+az aks browse --resource-group "your_RG_name" --name "your_cluster_name"
+az aks show --resource-group "your_RG_name" --name "your_cluster_name"
+
+// AKS Cluster with UDR enabled to avoid creation of Public IPs in MC_ Resource_group
+az aks create -g "Resource_group_name" -n "cluster_name" -l "region" --network-plugin "azure CNI or kubenet" --network-policy "calico or default" --generate-ssh-keys --service-cidr 192.168.0.0/16 --dns-service-ip 192.168.0.10 --docker-bridge-address 172.22.0.1/29 --vnet-subnet-id "full_path_of_subnetID"  --aad-client-app-id "AAD_Client_APP_ID" --aad-server-app-id "AAD_server_principal_APP_ID" --service-principal "AAD_server_principal_APP_ID" --client-secret ******= --aad-server-app-secret E******************Z0 --aad-tenant-id "AAD_tenant_ID" --attach-acr "registry_full_path" --enable-addons monitoring --enable-cluster-autoscaler --min-count 1 --max-count 50 --enable-rbac --node-vm-size Standard_DS2_v2 --vm-set-type VirtualMachineScaleSets --load-balancer-sku standard --outbound-type userDefinedRouting --api-server-authorized-ip-ranges ***.***.****.***/**

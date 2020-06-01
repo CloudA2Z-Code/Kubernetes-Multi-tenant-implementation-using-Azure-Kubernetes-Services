@@ -1,0 +1,39 @@
+---
+#create Deployment
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: webapp-deployment
+  namespace: your_namespace_name
+spec:
+  selector:
+    matchLabels:
+      app: webapp
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: webapp
+        image: scottyc/webapp:latest
+        ports:
+        - containerPort: 3000
+          hostPort: 3000
+---
+#create app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+  namespace: your_namespace_name
+spec:
+  selector:
+    app: webapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9376

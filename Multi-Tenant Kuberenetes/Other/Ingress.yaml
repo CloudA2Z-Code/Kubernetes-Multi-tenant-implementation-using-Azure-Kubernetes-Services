@@ -1,0 +1,56 @@
+# Commit all YAMLS required to create Ingresses for 'your_namespace_name' in this single file
+---
+# Ingress routing HTTP traffic only
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: demo-ingress
+  namespace: your_namespace_name
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "64k"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /webapp
+        backend:
+          serviceName: webapp-service
+          servicePort: 80
+---
+# Ingress routing for HTTPS traffic
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+      nginx.com/health-checks: "true"
+      nginx.ingress.kubernetes.io/proxy-buffer-size: "64k"
+    name: demo-ingress
+    namespace: your_namespace_name
+spec:
+    rules:
+      - host: service.domain.com
+        http:
+          paths:
+            - backend:
+                serviceName: service
+                servicePort: 80
+              path: /
+            - backend:
+                serviceName: service1
+                servicePort: 8081
+              path: /project1
+            - backend:
+                serviceName: service2
+                servicePort: 8083
+              path: /project2
+    # This section is only required if TLS is to be enabled for the Ingress
+    tls:
+        - hosts:
+            - service.domain.com
+          secretName: tlssecret1

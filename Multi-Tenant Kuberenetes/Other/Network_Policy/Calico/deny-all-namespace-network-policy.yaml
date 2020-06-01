@@ -1,0 +1,16 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: deny-all-namespace-network-policy
+  namespace: your_namespace_name
+spec:
+  podSelector:
+    matchLabels:
+  ingress:
+  - from:
+    - podSelector: {}
+  egress:
+  - {}  
+  policyTypes:
+  - Egress
+  - Ingress
