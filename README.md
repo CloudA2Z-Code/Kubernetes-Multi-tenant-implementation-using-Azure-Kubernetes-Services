@@ -10,3 +10,5 @@ Implementation:
 4) Define add-on Yamls(resource quota, limit range).
 5) DevOps integaraton for deploying applications into provisioned Kubernetes(AKS) cluster.
    Follow this article for integrating with AzureDevOps(AzDo): https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/kubernetes/aks-template?view=azure-devops
+
+In case of any doubts tweet me at @theazureguy007 or watch this complete youtube video how to implement: 
