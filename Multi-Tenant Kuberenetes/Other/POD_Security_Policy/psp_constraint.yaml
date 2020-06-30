@@ -1,0 +1,83 @@
+# kubectl apply -f psp_constraint.yaml
+# NOTE: Check existing namespaces on the PSPs and then apply
+# Run this command to check allowed NS
+# kubectl describe K8sPSP psp
+
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSP
+metadata:
+  name: psp
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    excludedNamespaces:
+      - kube-system
+      - gatekeeper-system
+      - default
+      - kubecost
+      - pkfg3-7227-prd # Excluded to allow pod with priveleged access      
+  parameters:
+    #allowedProfiles:
+    #  - runtime/default
+    #  - docker/default
+    #This is redundant with non-root and allowPrivilegedEscalation set to false
+    # allowedCapabilities: ["something"]
+    # requiredDropCapabilities: ["must_drop"]
+    # allowedFlexVolumes: #[]
+     # - driver: "example/lvm"
+     # - driver: "example/cifs"
+    forbiddenSysctls:
+      # - "*" # * may be used to forbid all sysctls
+      - kernel.*
+    rule: "MayRunAs" #"MustRunAs" #"MayRunAs", "RunAsAny"
+    ranges:
+      - min: 1
+        max: 1000
+   # allowedHostPaths:
+   #   - readOnly: true
+   #     pathPrefix: "/foo"
+    hostNetwork: false
+    # procMount: Default
+    # allowedSELinuxOptions:
+   #     level: s0:c123,c456
+   #     role: object_r
+   #     type: svirt_sandbox_file_t
+   #     user: system_u
+   # runAsUser:
+   #   rule: MustRunAsNonRoot
+     # ranges:
+     #   - min: 100
+     #     max: 200
+    volumes:
+    # - "*" # * may be used to allow all volume types
+    - configMap
+    - emptyDir
+    - projected
+    - secret
+    - downwardAPI
+    - persistentVolumeClaim
+    #- hostPath #required for allowedHostPaths
+    #- flexVolume #required for allowedFlexVolumes
+    - awsElasticBlockStore
+    - azureDisk
+    - azureFile
+    - cephFS
+    - cinder
+    - csi
+    - fc
+    - flexVolume
+    - flocker
+    - gcePersistentDisk
+    - gitRepo
+    - glusterfs
+    - iscsi
+    - nfs
+    - photonPersistentDisk
+    - portworxVolume
+    - quobyte
+    - rbd
+    - scaleIO
+    - storageos
+    - vsphereVolume
