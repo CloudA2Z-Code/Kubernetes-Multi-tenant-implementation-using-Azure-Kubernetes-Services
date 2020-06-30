@@ -17,7 +17,6 @@ spec:
       - gatekeeper-system
       - default
       - kubecost
-      - pkfg3-7227-prd # Excluded to allow pod with priveleged access      
   parameters:
     #allowedProfiles:
     #  - runtime/default
