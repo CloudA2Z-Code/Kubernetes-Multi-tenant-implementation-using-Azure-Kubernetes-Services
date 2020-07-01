@@ -1,0 +1,159 @@
+---
+<<<<<<< HEAD:Kubernetes_Dashboard_Access/Dashboard_Cluster_Reader.yaml
+# kubectl apply -f Dashboard_Cluster_Reader.yaml
+#This Role file creates cluster level reader permissions
+#Used for 'kubernetes-dashboard' access
+=======
+## Namespace User yaml
+# Use this for addition of your existing AAD user to AKS cluster
+# This below lines of code creates Namespace, Role, Role Bindings with Namespace User privileges & Role Bindings in a namespace.
+
+# Note: Deployments and Services is application team developers responsibilty
+#       Namespace Admin is responsible in managing teams user under AKS Namespace.
+>>>>>>> e9f079f352910c7be942ff8b826c8e20dcf5e62e:CMC_MC_Components/Namespace_User/Namespace_User_RoleNRoleBinding.yaml
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+<<<<<<< HEAD:Kubernetes_Dashboard_Access/Dashboard_Cluster_Reader.yaml
+  name: cluster-reader
+=======
+  name: namespace-user-r
+  namespace: application_name-iteraplanid-env
+>>>>>>> e9f079f352910c7be942ff8b826c8e20dcf5e62e:CMC_MC_Components/Namespace_User/Namespace_User_RoleNRoleBinding.yaml
+rules:
+  # namespaces
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["namespaces"]
+  verbs: ["get", "list", "watch"]
+  # "roles" rules
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["roles"]
+  verbs: ["get", "list", "watch"]
+  # "rolebindings" rules
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["rolebindings"]
+  verbs: ["get", "list", "watch"]
+  # "clusterroles" rules
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["clusterroles"]
+  verbs: ["get", "list", "watch"]
+  # "clusterrolebindings" rules
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["clusterrolebindings"]
+  verbs: ["get", "list", "watch"]
+  # "Pods" rules
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+  # "Nodes" rules - Node rules are effective only on cluster-role-binding
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
+  # "Secrets" rules
+  # Find way to filter secrets of type : "kubernetes.io/service-account-token", "Opaque", "helm.sh/release.v1", "kubernetes.io/tls"
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: [""]
+  # "TLS Secrets" rules
+  # Need to add TLS sepration in future
+  # "deployments" rules
+- apiGroups: ["apps", "batch", "extensions"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch"] 
+  # "services" rules  
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "watch"]
+  # services endpoints
+- apiGroups: [""]
+  resources: ["endpoints"]
+  verbs: ["get", "list", "watch"]  
+  # "configmaps" rules
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]  
+  # "Extensions" rules
+- apiGroups: ["batch", "extensions"]
+  resources: ["jobs"]
+  verbs: ["get", "list", "watch"]
+  # "cronjobs" rules
+- apiGroups: ["batch"]
+  resources: ["cronjobs"]
+  verbs: ["get", "list", "watch"]
+  # "daemonsets" rules
+- apiGroups: ["apps", "extensions"]
+  resources: ["daemonsets"]
+  verbs: ["get", "list", "watch"]
+  # "ingresses" rules
+- apiGroups: ["extensions"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "watch"]
+  # "replicasets" rules
+- apiGroups: ["apps", "extensions"]
+  resources: ["replicasets"]
+  verbs: ["get", "list", "watch"]
+  #statefulsets
+- apiGroups: ["apps"]
+  resources: ["statefulsets"]
+  verbs: ["get", "list", "watch"]
+  #replicationcontrollers
+- apiGroups: [""]
+  resources: ["replicationcontrollers"]
+  verbs: ["get", "list", "watch"]
+  #events
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["get", "list", "watch"]
+  #persistentvolumes
+  # "Persistent volumes" rules - are effective only on cluster-role-binding
+- apiGroups: [""]
+  resources: ["persistentvolumes"]
+  verbs: ["get", "list", "watch"]
+  #persistentvolumeclaims
+- apiGroups: [""]
+  resources: ["persistentvolumeclaims"]
+  verbs: ["get", "list", "watch"]
+  #storageclasses
+  # "storageclasses" rules - are effective only on cluster-role-binding
+- apiGroups: ["storage.k8s.io"]
+  resources: ["storageclasses"]
+  verbs: ["get", "list", "watch"]
+  #resourcequotas
+- apiGroups: [""]
+  resources: ["resourcequotas"]
+  verbs: ["get", "list", "watch"]
+  #limitranges
+- apiGroups: [""]
+  resources: ["limitranges"]
+  verbs: ["get", "list", "watch"]  
+  #non resource urls
+- nonResourceURLs: ["/healthz", "/healthz/*"]
+  verbs: ["get"]
+---
+#Clusterolebinding.yml
+#This ClusterRoleBinding file assigns cluster reader role to 'kubernetes-dashboard' service account existing in kube-system
+#Used for 'kubernetes-dashboard' access
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+<<<<<<< HEAD:Kubernetes_Dashboard_Access/Dashboard_Cluster_Reader.yaml
+  name: cmc-cluster-reader-rbg
+=======
+  name: namespace-user-rbg
+  namespace: application_name-iteraplanid-env
+subjects:
+- kind: User
+  name: "KID@uniper.energy" #kid only and in uppercase
+- kind: User
+  name: "KID@uniper.energy"
+>>>>>>> e9f079f352910c7be942ff8b826c8e20dcf5e62e:CMC_MC_Components/Namespace_User/Namespace_User_RoleNRoleBinding.yaml
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-reader
+subjects:
+  - kind: ServiceAccount
+    name: kubernetes-dashboard
+    namespace: kube-system

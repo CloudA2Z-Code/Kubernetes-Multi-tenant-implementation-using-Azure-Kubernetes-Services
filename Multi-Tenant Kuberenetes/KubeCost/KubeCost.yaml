@@ -1,0 +1,37 @@
+# kubectl apply -f KubeCost.yaml
+# Namespace Naming Convention(lowercase Only) : applicationname + iterationplanid + env + servicecomponent i.e. cmcpoc-293103cl03-dev
+
+# Remove the namespace prefix in the roles and role bindings
+
+
+## Namespace Admin
+# Use this for 'namespace admin' user access
+# This below lines of code creates Namespace, Role with Namespace Admin privileges & Role Bindings in a namespace.
+# Note: Deployments and Services is kubecost developers responsibilty
+---
+# Created a project specific namespace 'kubecost'
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  labels:
+    environment: preprod
+    project_name: kubecost
+    application_name: kubecost
+  name: kubecost
+---
+# Creates a ResourceQuota 'requests-resourcequota' Specific to project namespace
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: requests-resourcequota
+  namespace: kubecost
+spec:
+  hard:
+    #pods: "4"
+    requests.cpu: "2" # metric - 'm' millicore, containers can get a single req with 500m or 50 requests with 10m 
+    requests.memory: 8Gi # metrics - 'Mib' or 'Gib' total requested memory by container < 1GB
+    limits.cpu: "2" # Maximum CPU which can be claimed by combined or single container
+    limits.memory: 8Gi # Maximum Memory which can be claimed by combined or single container
+---

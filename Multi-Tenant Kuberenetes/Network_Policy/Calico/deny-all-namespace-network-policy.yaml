@@ -1,0 +1,18 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: deny-all-namespace-network-policy
+  namespace: namespace
+spec:
+  podSelector:
+    matchLabels:
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          control-plane: 'true' # do not delete this entry, it is set to allow communication from ingress controller running in kube-system.
+  egress:
+  - {}  
+  policyTypes:
+  - Egress
+  - Ingress

@@ -1,0 +1,21 @@
+# kubectl apply -f cpu-limit-range.yaml
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-limit-range
+  namespace: app_name-IteraPlanID-env
+spec:
+  limits:
+  - default:
+      cpu: 200m
+      memory: 256Mi      
+    defaultRequest:
+      cpu: 100m
+      memory: 50Mi
+    max:
+      cpu: 600m
+      memory: 200Mi
+    min:
+      cpu: 10m
+      memory: 10Mi
+    type: Container

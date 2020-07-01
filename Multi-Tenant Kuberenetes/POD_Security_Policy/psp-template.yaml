@@ -1,0 +1,157 @@
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: privileged
+  annotations:
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
+spec:
+  
+  # Setting privileged to true we will allow the pod access to all devices on host (Node) which will allow the containers the same access as the processors running on the node. 
+  # Useful in cases where container needs to manipulate the networking stack of host and have access to the host devices.
+  privileged: false # Other options: true
+  
+  # Specifies if we can set the security context of a container to allowPrivilegeEscalation=true. This defaults to allowed so as to not break setuid binaries.
+  # Setting it to false ensures that no child process of a container can gain more privileges than its parent.
+  allowPrivilegeEscalation: false
+  
+  # Sets the default for the allowPrivilegeEscalation option. The default behavior without this is to allow privilege escalation so as to not break setuid binaries. 
+  # If that behavior is not desired, this field can be used to default to disallow, while still permitting pods to request allowPrivilegeEscalation explicitly.
+  defaultAllowPrivilegeEscalation: false
+  
+  # Capabilities: Linux divides the privileges traditionally associated with superuser into distinct units, known as capabilities,
+  # which can be independently enabled and disabled. Capabilities are a per-thread attribute. Some of these capabilities can be used to escalate privileges 
+  # or for container breakout, and may be restricted by the PSP. List of Capabilities (http://man7.org/linux/man-pages/man7/capabilities.7.html)
+  # The following fields take a list of capabilities, specified as the capability name in ALL_CAPS without the CAP_ prefix.
+  # Provides a whitelist of capabilities that may be added to a container. The default set of capabilities are implicitly allowed. 
+  # The empty set means that no additional capabilities may be added beyond the default set. * can be used to allow all capabilities.
+  allowedCapabilities:
+  - '*'
+  # The capabilities which must be dropped from containers. These capabilities are removed from the default set, and must not be added. 
+  # Capabilities listed in RequiredDropCapabilities must not be included in AllowedCapabilities or DefaultAddCapabilities
+  requiredDropCapabilities:
+  - ALL
+  # The capabilities which are added to containers by default, in addition to the runtime defaults. 
+  # See the Docker documentation for the default list of capabilities when using the Docker runtime (CHOWN, DAC_OVERRIDE, FSETID, 
+  # FOWNER, MKNOD, NET_RAW, SETGID, SETUID, SETFCAP, SETPCAP, NET_BIND_SERVICE, SYS_CHROOT, KILL, AUDIT_WRITE).
+  DefaultAddCapabilities:
+  - '*'
+  
+  # Provides a list of volume types a pod can access. Following are recommended minimum set
+  # For a complete list refer "https://kubernetes.io/docs/concepts/storage/volumes/#types-of-volumes"
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    # Assume that persistentVolumes set up by the cluster admin are safe to use.
+    - 'persistentVolumeClaim'
+  
+  # Decides if a pod can use network namespace of the Node. Setting it to "true" will give pod access
+  # to the loopback device, services listening on the localhost, and could allow the pod to snoop on
+  # the network activities of other pods on the same node
+  hostNetwork: false
+  
+  # Specifies a range of allowable ports in the host network namespace. Defaults to no allowed host ports
+  hostPorts:
+  - min: 0
+    max: 65535
+  
+  # Specifies if the pod containers can share the host (Node) IPC namespace
+  hostIPC: false
+  
+  # Specifies if the pod containers can share the host process ID namespace. Paired with ptrace this can be 
+  # used to escalate privileges outside of the container
+  hostPID: false
+  
+  # Controls which user ID the containers are run with. Validation is done against runAsUser specified in security
+  # context of the pod.
+  # MustRunAs: Requires at least one range to be specified. Uses the minimum value of the first range as the default. 
+  # 		   Validates against all ranges
+  # MustRunAsNonRoot: Requires that the pod be submitted with a non-zero runAsUser or have the USER directive 
+  #			       	  defined (using a numeric UID) in the image. Pods which have specified neither runAsNonRoot 
+  #					  nor runAsUser settings will be mutated to set runAsNonRoot=true, 
+  #					  thus requiring a defined non-zero numeric USER directive in the container. No default provided. 
+  #					  Setting allowPrivilegeEscalation=false is strongly recommended with this strategy.
+  # RunAsAny: No default provided. Allows any runAsUser to be specified.
+  runAsUser:
+    rule: 'MustRunAsNonRoot'
+    
+  # Controls which primary group ID the containers are run with. Validation is done against runAsGroup specified in security
+  # MustRunAs: Requires at least one range to be specified. Uses the minimum value of the first range as the default. Validates against all ranges.
+  # MayRunAs: Does not require that RunAsGroup be specified. However, when RunAsGroup is specified, they have to fall in the defined range.
+  # RunAsAny: No default provided. Allows any runAsGroup to be specified
+  runAsGroup:
+    rule: 'RunAsAny'
+  
+  # SELinux: Security-Enhanced Linux (SELinux) is a security architecture for Linux® systems that allows administrators to have more control over who can access the system.
+  # SELinux defines access controls for the applications, processes, and files on a system. It uses security policies, 
+  # which are a set of rules that tell SELinux what can or can’t be accessed, to enforce the access allowed by a policy.
+  # MustRunAs: Requires seLinuxOptions to be configured. Uses seLinuxOptions as the default. Validates against seLinuxOptions.
+  # RunAsAny: No default provided. Allows any seLinuxOptions to be specified.
+  seLinux:
+    rule: 'RunAsAny'
+  
+  # SupplementalGroups: Supplemental groups are regular Linux groups. When a process runs in Linux, it has a UID, a GID, 
+  # 					and one or more supplemental groups. These attributes can be set for a container’s main process. 
+  #						The supplementalGroups IDs are typically used for controlling access to shared storage, such as NFS and GlusterFS, 
+  #						whereas fsGroup is used for controlling access to block storage, such as Ceph RBD and iSCSI
+  # supplementalGroups in PSP validates the supplementalGroups in security context of a pod that it can access.
+  # MustRusAs: Requires at least one range to be specified. Uses the minimum value of the first range as the default. Validates against all ranges. 
+  # MayRunAs: Requires at least one range to be specified. Allows supplementalGroups to be left unset without providing a default. 
+  #			  Validates against all ranges if supplementalGroups is set.
+  # RunAsAny: No default provided. Allows any supplementalGroups to be specified.
+  supplementalGroups:
+    rule: 'MustRunAs'
+    ranges:
+      # Forbid adding the root group.
+      - min: 1
+        max: 65535
+        
+  # fsGroup specifies a pod's file system group ID (all the new files created as well in the file system) 
+  # and group IDs for all the processes of the container. Groups can be assigned to logically tie users together for a common security, privilege and access purpose.
+  # Files and devices may be granted access based on a users ID or group ID. fsGroup in PSP validates the
+  # fsGroup of security context for a pod that it can access. Following are the three possible rules:
+  # MustRusAs: Requires at least one range to be specified. Uses the minimum value of the first range as the default. Validates against all ranges. 
+  # MayRunAs: Requires at least one range to be specified. Allows FSGroups to be left unset without providing a default. Validates against all ranges if FSGroups is set.
+  # RunAsAny: No default provided. Allows any fsGroup ID to be specified.
+  fsGroup:
+    rule: 'MustRunAs'
+    ranges:
+      # Avoid adding the root group in any of the ranges (root account has a group ID 0).
+      - min: 1
+        max: 65535
+        
+  # HostPath: A hostPath volume mounts a file or directory from the host node's filesystem into your pod. Very rarely used.
+  # One of the uses of hostPath can be for example if you are trying to run a container that needs access to Docker internals,
+  # in that case security context for pod needs to specify hostPath as /var/lib/docker
+  # allowedHostPaths in PSP specifies a list of host paths allowed to be used in hostPath volumes of Security Context for a Pod.
+  # Empty list means no restriction. It has pathPrefix field, which allows hostPath volumes to mount a path that begins with an allowed prefix, 
+  # and a readOnly field indicating it must be mounted read-only. Writeable hostPath directory can allow containers to maniuplate the file system
+  # and can also let them explore the host filesystem outside the pathPrefix specified. readOnly: true must be used on all allowedHostPaths to 
+  # effectively limit access to the specified pathPrefix
+  allowedHostPaths:
+  - pathPrefix: "/foo"
+  	readOnly: true
+    
+  # Requires that containers must run with a read-only root filesystem. true is recommended to avoid any writing in the root filesystem
+  readOnlyRootFilesystem: true
+  
+  # Flexvolume: Flexvolume enables users to write their own drivers and add support for their volumes in Kubernetes. 
+  # It's an an out-of-tree plugin interface. 
+  # allowedFlexVolumes in PSP specifies a whitelist of FlexVolume drivers that are allowed to be used by flexvolume. 
+  # An empty list or nil means there is no restriction on the drivers. Please make sure volumes field contains the flexVolume volume type, 
+  # no FlexVolume driver is allowed otherwise.
+  allowedFlexVolumes:
+  - driver: example/lvm
+  - driver: example/cifs
+  
+  # Sysctl: sysctl is a software utility of some Unix-like operating systems that reads and modifies the attributes 
+  # of the system kernel such as its version number, maximum limits, and security settings
+  # Excludes specific sysctls. You can forbid a combination of safe and unsafe sysctls in the list. To forbid setting any sysctls, use * on its own.
+  allowedUnsafeSysctls:
+  - kernel.msg*
+  
+  # Allows specific sysctls that had been disallowed by the default list, so long as these are not listed in forbiddenSysctls.
+  forbiddenSysctls:
+  - kernel.shm_rmid_forced

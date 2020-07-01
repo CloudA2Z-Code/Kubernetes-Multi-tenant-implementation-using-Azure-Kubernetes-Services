@@ -1,0 +1,127 @@
+---
+## Namespace User yaml
+# Use this for addition of your existing AAD user to AKS cluster
+# This below lines of code creates Namespace, Role, Role Bindings with Namespace User privileges & Role Bindings in a namespace.
+
+# Note: Deployments and Services is application team developers responsibilty
+#       Namespace Admin is responsible in managing teams user under AKS Namespace.
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: namespace-user-r
+  namespace: application_name-iteraplanid-env
+rules:
+  # "roles" rules
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["roles"]
+  verbs: ["get", "list", "watch"]
+  # "rolebindings" rules
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["rolebindings"]
+  verbs: ["get", "list", "watch"]  
+  # Services
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "view", "create", "update", "delete"]
+  # services endpoints
+- apiGroups: [""]
+  resources: ["endpoints"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"] 
+  # "Pods" rules
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  # "Nodes" rules - Node rules are effective only on cluster-role-binding
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
+  # "Secrets" rules
+  # Find way to filter secrets of type : "kubernetes.io/service-account-token", "Opaque", "helm.sh/release.v1", "kubernetes.io/tls"
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list", "watch", "create","update", "delete"]
+  # "TLS Secrets" rules
+  # Need to add TLS sepration in future
+  # "deployments" rules
+- apiGroups: ["apps", "batch", "extensions"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  # "services" rules
+  # "configmaps" rules
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]  
+  # "Extensions" rules
+- apiGroups: ["batch", "extensions"]
+  resources: ["jobs"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # "cronjobs" rules
+- apiGroups: ["batch"]
+  resources: ["cronjobs"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  # "daemonsets" rules
+- apiGroups: ["apps", "extensions"]
+  resources: ["daemonsets"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  # "ingresses" rules
+- apiGroups: ["extensions"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  # "replicasets" rules
+- apiGroups: ["apps", "extensions"]
+  resources: ["replicasets"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  #statefulsets
+- apiGroups: ["apps"]
+  resources: ["statefulsets"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  #replicationcontrollers
+- apiGroups: [""]
+  resources: ["replicationcontrollers"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  #events
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  #persistentvolumes
+  # "Persistent volumes" rules - are effective only on cluster-role-binding
+- apiGroups: [""]
+  resources: ["persistentvolumes"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  #persistentvolumeclaims
+- apiGroups: [""]
+  resources: ["persistentvolumeclaims"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  #storageclasses
+  # "storageclasses" rules - are effective only on cluster-role-binding
+- apiGroups: ["storage.k8s.io"]
+  resources: ["storageclasses"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+  #resourcequotas
+- apiGroups: [""]
+  resources: ["resourcequotas"]
+  verbs: ["get", "list", "watch"]
+  #limitranges : Need to be finalized
+- apiGroups: [""]
+  resources: ["limitranges"]
+  verbs: ["get", "list", "watch"]
+---
+# Below code creates 'namespace-user-rbg' RoleBinding which attaches the AAD Group or users to a Role with Namespace user priveleges. 
+# Note: Email IDs ust be in lowercase only.
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: namespace-user-rbg
+  namespace: application_name-iteraplanid-env
+subjects:
+- kind: User
+  name: "EMAIL ID" # Email ID only and in uppercase
+- kind: User
+  name: "EMAIL ID"
+roleRef:
+  kind: Role #this must be Role or ClusterRole
+  name: namespace-user-r # must match the name of the Role
+  apiGroup: rbac.authorization.k8s.io
+---

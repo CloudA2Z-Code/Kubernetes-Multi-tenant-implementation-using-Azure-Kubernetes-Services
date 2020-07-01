@@ -1,0 +1,23 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-access-to-specific-namespace-network-policy
+<<<<<<< HEAD:Network_Policy/Calico/allow-access-to-specific-namespace-network-policy.yaml
+  namespace: ns
+=======
+  namespace: cmcpoc-293103cl03-dev
+>>>>>>> e9f079f352910c7be942ff8b826c8e20dcf5e62e:CMC_MC_Components/Network_Policy/Calico/allow-access-to-specific-namespace-network-policy.yaml
+spec:
+  podSelector:
+    matchLabels:
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          label: 'label_value'
+    - podSelector: {}
+  egress:
+  - {}  
+  policyTypes:
+  - Egress
+  - Ingress
