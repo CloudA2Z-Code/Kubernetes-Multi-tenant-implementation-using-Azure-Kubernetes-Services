@@ -1,26 +1,12 @@
 ---
-<<<<<<< HEAD:Kubernetes_Dashboard_Access/Dashboard_Cluster_Reader.yaml
 # kubectl apply -f Dashboard_Cluster_Reader.yaml
 #This Role file creates cluster level reader permissions
 #Used for 'kubernetes-dashboard' access
-=======
-## Namespace User yaml
-# Use this for addition of your existing AAD user to AKS cluster
-# This below lines of code creates Namespace, Role, Role Bindings with Namespace User privileges & Role Bindings in a namespace.
-
-# Note: Deployments and Services is application team developers responsibilty
-#       Namespace Admin is responsible in managing teams user under AKS Namespace.
->>>>>>> e9f079f352910c7be942ff8b826c8e20dcf5e62e:CMC_MC_Components/Namespace_User/Namespace_User_RoleNRoleBinding.yaml
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-<<<<<<< HEAD:Kubernetes_Dashboard_Access/Dashboard_Cluster_Reader.yaml
   name: cluster-reader
-=======
-  name: namespace-user-r
-  namespace: application_name-iteraplanid-env
->>>>>>> e9f079f352910c7be942ff8b826c8e20dcf5e62e:CMC_MC_Components/Namespace_User/Namespace_User_RoleNRoleBinding.yaml
 rules:
   # namespaces
 - apiGroups: ["rbac.authorization.k8s.io"]
@@ -138,17 +124,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-<<<<<<< HEAD:Kubernetes_Dashboard_Access/Dashboard_Cluster_Reader.yaml
-  name: cmc-cluster-reader-rbg
-=======
-  name: namespace-user-rbg
-  namespace: application_name-iteraplanid-env
-subjects:
-- kind: User
-  name: "KID@uniper.energy" #kid only and in uppercase
-- kind: User
-  name: "KID@uniper.energy"
->>>>>>> e9f079f352910c7be942ff8b826c8e20dcf5e62e:CMC_MC_Components/Namespace_User/Namespace_User_RoleNRoleBinding.yaml
+  name: cluster-reader-rbg
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
