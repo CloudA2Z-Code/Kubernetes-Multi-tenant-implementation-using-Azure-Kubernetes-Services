@@ -1,5 +1,5 @@
 # kubectl apply -f KubeCost.yaml
-# Namespace Naming Convention(lowercase Only) : applicationname + iterationplanid + env + servicecomponent i.e. cmcpoc-293103cl03-dev
+# Namespace Naming Convention(lowercase Only) : 
 
 # Remove the namespace prefix in the roles and role bindings
 
